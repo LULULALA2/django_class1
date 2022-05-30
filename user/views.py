@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import UserModel
-from django.http import HttpResponse
 from django.contrib.auth import get_user_model #사용자가 있는지 검사하는 함수
 from django.contrib import auth # 사용자 auth 기능
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -47,10 +47,16 @@ def sign_in_view(request):
             auth.login(request, me)
         # if me.password == password: # 저장된 사용자의 pw와 입력받은 pw 비교
         #     request.session['user'] = me.username # 세션에 사용자 이름 저장
-            return HttpResponse(me.username)
+            return redirect('/')
         else:
             return redirect('/sign-in')
 
 
     elif request.method == 'GET':
         return render(request, 'user/signin.html')
+
+
+@login_required # 로그인 한 사용자만 접근 할 수 있게 해 주는 기능
+def logout(request):
+    auth.logout(request) # 인증 되어있는 정보를 없애기
+    return redirect("/")
