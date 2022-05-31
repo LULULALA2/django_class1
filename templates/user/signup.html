@@ -25,6 +25,11 @@
                     <label for="bio">나를 한마디로</label>
                     <input type="text" class="form-control" id="bio" name="bio">
                 </div>
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endif %}
                 <hr>
                 <div style="float: right">
                     <button type="submit" class="btn btn-primary">회원가입</button>

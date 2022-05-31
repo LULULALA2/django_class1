@@ -10,19 +10,24 @@ def sign_up_view(request):
     if request.method == 'GET':
         return render(request, 'user/signup.html')
     elif request.method == 'POST':
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
-        password2 = request.POST.get('password2', None)
-        bio = request.POST.get('bio', None)
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        password2 = request.POST.get('password2', '')
+        bio = request.POST.get('bio', '')
 
 
         if password != password2:
-            return render(request, 'user/signup.html')
+            # 패스워드가 같지 않다고 알람
+            return render(request, 'user/signup.html', {'error':'패스워드를 확인해 주세요!'})
         else:
-            exist_user = get_user_model().objects.filter(username=username)
+            if username == '' or password == '':
+                return render(request, 'user/signup.html', {'error': '사용자 이름과 비밃번호는 필수입니다!'})
+
             # username이 내가 지금 입력한 username이랑 같은 사용자가 있는지의 조건(filter)으로 검색한다
+            exist_user = get_user_model().objects.filter(username=username)
             if exist_user: # 필터링된 유저가 존재한다면
-                return render(request, 'user/signup.html')  # 사용자가 존재하기 때문에 사용자를 저장하지 않고 회원가입 페이지를 다시 띄움
+                # 사용자가 존재하기 때문에 사용자를 저장하지 않고 회원가입 페이지를 다시 띄움
+                return render(request, 'user/signup.html', {'error': '사용자가 존재합니다.'})
             else:
                 UserModel.objects.create_user(username=username, password=password, bio=bio)
                 return redirect('/sign-in')  # 회원가입이 완료되었으므로 로그인 페이지로 이동
@@ -30,8 +35,8 @@ def sign_up_view(request):
 
 def sign_in_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
 
         # 사용자 불러오기
         me = auth.authenticate(request, username=username, password=password)
@@ -44,7 +49,8 @@ def sign_in_view(request):
         #     request.session['user'] = me.username # 세션에 사용자 이름 저장
             return redirect('/')
         else:
-            return redirect('/sign-in')
+            return render(request, 'user/signin.html', {'error':'유저이름과 패스워드를 확인해주세요;ㅅ;'})
+
 
 
     elif request.method == 'GET':

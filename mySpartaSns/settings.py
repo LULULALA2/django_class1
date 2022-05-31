@@ -23,23 +23,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8hani4-v92v&xc&1wrexn-g4=l=jy+sgbn)vbk4hqf$9)42s46'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'tweet',
+    'user',
+    'taggit.apps.TaggitAppConfig',
+    'taggit_templatetags2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tweet',
-    'user',
 ]
+
+TAGGIT_CASE_INSENSITIVE = True
+TAGGIT_LIMIT = 50
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
