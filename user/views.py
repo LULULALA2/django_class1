@@ -15,22 +15,17 @@ def sign_up_view(request):
         password2 = request.POST.get('password2', None)
         bio = request.POST.get('bio', None)
 
+
         if password != password2:
             return render(request, 'user/signup.html')
-
         else:
-            exist_user = UserModel.objects.filter(username=username) # filter: 있으면 가져오고 없으면 pass
+            exist_user = get_user_model().objects.filter(username=username)
             # username이 내가 지금 입력한 username이랑 같은 사용자가 있는지의 조건(filter)으로 검색한다
-
             if exist_user: # 필터링된 유저가 존재한다면
-                return render(request, 'user/signup.html')
+                return render(request, 'user/signup.html')  # 사용자가 존재하기 때문에 사용자를 저장하지 않고 회원가입 페이지를 다시 띄움
             else:
-                exist_user = get_user_model().objects.filter(username=username)
-                if exist_user:
-                    return render(request, 'user/signup.html') # 내용을 저장하지 않고 회원가입 페이지를 다시 띄움
-                else:
-                    UserModel.objects.create_user(username=username, password=password)
-                    return redirect('/sign-in') # 회원가입이 완료되었으므로 로그인 페이지로 이동
+                UserModel.objects.create_user(username=username, password=password, bio=bio)
+                return redirect('/sign-in')  # 회원가입이 완료되었으므로 로그인 페이지로 이동
 
 
 def sign_in_view(request):
@@ -60,3 +55,22 @@ def sign_in_view(request):
 def logout(request):
     auth.logout(request) # 인증 되어있는 정보를 없애기
     return redirect("/")
+
+
+@login_required
+def user_view(request):
+    if request.method == 'GET':
+        # 사용자를 불러오기, exclude와 request.user.username 를 사용해서 '로그인 한 사용자'를 제외하기
+        user_list = UserModel.objects.all().exclude(username=request.user.username)
+        return render(request, 'user/user_list.html', {'user_list': user_list})
+
+
+@login_required
+def user_follow(request, id):
+    me = request.user
+    click_user = UserModel.objects.get(id=id)
+    if me in click_user.followee.all():
+        click_user.followee.remove(request.user)
+    else:
+        click_user.followee.add(request.user)
+    return redirect('/user')
